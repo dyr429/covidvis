@@ -5,6 +5,9 @@ import { useSelector,useDispatch } from 'react-redux'
 import * as d3 from 'd3';
 import LoadingOverlay from 'react-loading-overlay';
 import {fetchDataFailAC,fetchDataProcessAC,fetchDataSuccessAC} from "./actions/actions";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Main from "./components/Main";
 
 function App() {
     const dataURL = "https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-states.csv"
@@ -16,21 +19,22 @@ function App() {
     }
     );
 
+
+    //new patern in D3V5. now use fetch and promise
     const fetchData = () => {
-        d3.csv(dataURL,(data)=>{
-            console.log(data)
-            dispatch(fetchDataSuccessAC(data))
-        })
+        d3.csv(dataURL)
+            .then((data)=>{
+                //console.log(data)
+                dispatch(fetchDataSuccessAC(data))
+            })
+
     }
   return (
     <div className="App">
-        <header className={"App-header"}>
-            ff
-        </header>
-        <div className={"container"}>
-                <img src={logo} className="App-logo" alt="logo" />
+        <Header ></Header>
+        <Main ></Main>
 
-        </div>
+        <Footer></Footer>
 
     </div>
   );
