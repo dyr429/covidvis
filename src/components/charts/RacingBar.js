@@ -13,7 +13,7 @@ function RacingBar() {
     const width = 600
     const barSize = 48
     const margin = ({top: 16, right: 6, bottom: 6, left: 0})
-    console.log(rawData);
+   // console.log(rawData);
 
     if(rawData&&rawData.length>0){
         //prepare data
@@ -29,7 +29,6 @@ function RacingBar() {
             .sort(([a], [b]) => d3.ascending(a, b))
 
         //console.log(datevalues)
-
 
         //rank function
         const rank = (value) => {
@@ -49,8 +48,6 @@ function RacingBar() {
         const keyframes = [];
         let ka, a, kb, b;
         for ([[ka, a], [kb, b]] of d3.pairs(datevalues)) {
-
-
             for (let i = 0; i < k; ++i) {
                 const t = i / k;
                 keyframes.push([
@@ -72,9 +69,8 @@ function RacingBar() {
         //prev and next
         const prev = new Map(nameframes.flatMap(([, data]) => d3.pairs(data, (a, b) => [b, a])))
         const next = new Map(nameframes.flatMap(([, data]) => d3.pairs(data)))
-        console.log(prev)
 
-
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // For drawing
 
         const bars = (svg) => {
@@ -102,11 +98,12 @@ function RacingBar() {
         }
 
 
+        //Label on bar end
         function labels(svg) {
             let label = svg.append("g")
                 .style("font", "bold 12px var(--sans-serif)")
                 .style("font-variant-numeric", "tabular-nums")
-                .attr("text-anchor", "end")
+                .attr("text-anchor", "start")
                 .selectAll("text");
 
             return ([date, data], transition) => label = label
@@ -115,13 +112,13 @@ function RacingBar() {
                     enter => enter.append("text")
                         .attr("transform", d => `translate(${x((prev.get(d) || d).value)},${y((prev.get(d) || d).rank)})`)
                         .attr("y", y.bandwidth() / 2)
-                        .attr("x", -6)
+                        .attr("x", 6)
                         .attr("dy", "-0.25em")
                         .text(d => d.state)
                         .call(text => text.append("tspan")
                             .attr("fill-opacity", 0.7)
                             .attr("font-weight", "normal")
-                            .attr("x", -6)
+                            .attr("x", 6)
                             .attr("dy", "1.15em")),
                     update => update,
                     exit => exit.transition(transition).remove()
@@ -169,6 +166,7 @@ function RacingBar() {
                 .attr("x", width - 6)
                 .attr("y", margin.top + barSize * (top - 0.45))
                 .attr("dy", "0.32em")
+                .attr("id", "ticker")
                 .text(formatDate(keyframes[0][0]));
 
             return ([date], transition) => {
@@ -189,15 +187,6 @@ function RacingBar() {
                 colour += ('00' + value.toString(16)).substr(-2);
             }
             return colour;
-
-
-            //     const scale = d3.scaleOrdinal(d3.schemeTableau10);
-        //     if (rawData.some(d => d.category !== undefined)) {
-        //     const categoryByName = new Map(rawData.map(d => [d.state, d.category]))
-        //     scale.domain(Array.from(categoryByName.values()));
-        //     return d => scale(categoryByName.get(d.state));
-        // }
-        // return d => scale(d.state);
     }
 
 
@@ -210,8 +199,8 @@ function RacingBar() {
 
 
         const createChart = async () =>{
-            d3.select("svg").remove()
-            console.log("draw")
+            //d3.select(refDiv.current).remove()
+           // console.log("draw")
             const svg = d3
                 .select(refDiv.current)
                 .append("svg")
@@ -219,14 +208,30 @@ function RacingBar() {
                 .attr("height", "600")
                 .attr("id", "racingbarchart");
 
-            const updateBars = bars(svg);
-            const updateAxis = axis(svg);
-            const updateLabels = labels(svg);
-            const updateTicker = ticker(svg);
-            svg.node();
-            for (const keyframe of keyframes) {
-                console.log("draw frame")
-                const transition = svg.transition()
+            const visG = svg.append("g")
+                .attr("id","mainchart")
+                .attr("transform", "translate(0,100)")
+
+
+            //title
+            svg.append("text")
+                .attr("transform", "translate(200,0)")
+                .attr("x", 50)
+                .attr("y", 50)
+                .attr("font-size", "20px")
+                .attr("class", "title")
+                .text("COVID-19 Racing Bar")
+
+            const updateBars = bars(visG);
+            const updateAxis = axis(visG);
+            const updateLabels = labels(visG);
+            const updateTicker = ticker(visG);
+            await visG.node();
+            for (let i = 0;i<keyframes.length-1;i++) {
+                let keyframe = keyframes[i]
+              //  console.log("draw frame")
+               // console.log(keyframe)
+                const transition = visG.transition()
                     .duration(duration)
                     .ease(d3.easeLinear);
 
@@ -237,10 +242,10 @@ function RacingBar() {
                 updateBars(keyframe, transition);
                 updateLabels(keyframe, transition);
                 updateTicker(keyframe, transition);
-
                 //invalidation.then(() => svg.interrupt());
                 await transition.end();
             }
+
 
 
 
@@ -251,7 +256,7 @@ function RacingBar() {
 
 
     return (
-        <div className="chart-container" ref={refDiv}>
+        <div ref={refDiv}>
 
         </div>
     );
