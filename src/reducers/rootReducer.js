@@ -5,8 +5,8 @@ import {
 } from "../actions/actions";
 
 const initialState = {
-
-    rawData: {},
+    rawDataUS: {},
+    rawDataStates: {},
     isLoading: false,
 
 }
@@ -20,9 +20,8 @@ const rootReducer = (state = initialState, action) => {
             return {...state,isLoading: false}
         }
         case FETCH_DATA_SUCCESS:{
-            return {...state,rawData: action.payload,isLoading: false}
+             return {...state,[action.target]: action.payload,isLoading: false}
         }
-
         default:
             return state;
     }

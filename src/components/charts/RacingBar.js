@@ -4,7 +4,7 @@ import * as d3 from "d3";
 import * as d3array from "d3-array"
 
 function RacingBar() {
-    const rawData = useSelector(state => state.rawData)
+    const rawDataStates = useSelector(state => state.rawDataStates)
     const refDiv = useRef(null);
     const top = 10
     const k = 10
@@ -13,18 +13,18 @@ function RacingBar() {
     const width = 600
     const barSize = 48
     const margin = ({top: 16, right: 6, bottom: 6, left: 0})
-   // console.log(rawData);
+   // console.log(rawDataStates);
 
-    if(rawData&&rawData.length>0){
+    if(rawDataStates&&rawDataStates.length>0){
         //prepare data
 
         //unique states
         //TODO use static array to imporove performance+
-        const states = new Set(rawData.map((d)=>d.state))
+        const states = new Set(rawDataStates.map((d)=>d.state))
         //console.log(states)
 
         // group by time
-        const datevalues = Array.from(d3array.rollup(rawData, ([d]) => d.cases, d => d.date, d => d.state))
+        const datevalues = Array.from(d3array.rollup(rawDataStates, ([d]) => d.cases, d => d.date, d => d.state))
             .map(([date, data]) => [new Date(date), data])
             .sort(([a], [b]) => d3.ascending(a, b))
 

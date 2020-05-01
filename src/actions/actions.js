@@ -4,10 +4,11 @@ export const FETCH_DATA_PROCESS = 'FETCH_DATA_PROCESS'
 /*
  * action creators
  */
-export function fetchDataSuccessAC(payload){
+export function fetchDataSuccessAC(payload,target){
     return {
         type: FETCH_DATA_SUCCESS,
-        payload
+        payload,
+        target
     }
 }
 
@@ -20,7 +21,7 @@ export function fetchDataFailAC(){
 
 export function fetchDataProcessAC(){
     return {
-        type: FETCH_DATA_SUCCESS,
+        type: FETCH_DATA_PROCESS,
     }
 }
 
