@@ -4,11 +4,12 @@ export const FETCH_DATA_PROCESS = 'FETCH_DATA_PROCESS'
 /*
  * action creators
  */
-export function fetchDataSuccessAC(payload,target){
+export function fetchDataSuccessAC(payload,targets){
     return {
         type: FETCH_DATA_SUCCESS,
         payload,
-        target
+        targets
+
     }
 }
 

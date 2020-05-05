@@ -7,6 +7,7 @@ import {
 const initialState = {
     rawDataUS: {},
     rawDataStates: {},
+    rawDataCounties: {},
     isLoading: false,
 
 }
@@ -20,7 +21,13 @@ const rootReducer = (state = initialState, action) => {
             return {...state,isLoading: false}
         }
         case FETCH_DATA_SUCCESS:{
-             return {...state,[action.target]: action.payload,isLoading: false}
+             let newstate = {...state}
+             //console.log(action)
+             newstate["isLoading"] = false
+             for(let i=0;i<action.targets.length;i++){
+                 newstate[action.targets[i]] = action.payload[i]
+             }
+             return newstate
         }
         default:
             return state;

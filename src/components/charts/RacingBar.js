@@ -3,72 +3,10 @@ import {useSelector} from "react-redux";
 import * as d3 from "d3";
 import * as d3array from "d3-array"
 
-function RacingBar() {
-    const rawDataStates = useSelector(state => state.rawDataStates)
+function RacingBar({prev,next,keyframes,margin,barSize,width,height,duration,top,title}) {
+  //  const rawData = useSelector(state => state.rawDataStates)
     const refDiv = useRef(null);
-    const top = 10
-    const k = 10
-    const duration = 50
-    const height = 600
-    const width = 600
-    const barSize = 48
-    const margin = ({top: 16, right: 6, bottom: 6, left: 0})
-   // console.log(rawDataStates);
-
-    if(rawDataStates&&rawDataStates.length>0){
-        //prepare data
-
-        //unique states
-        //TODO use static array to imporove performance+
-        const states = new Set(rawDataStates.map((d)=>d.state))
-        //console.log(states)
-
-        // group by time
-        const datevalues = Array.from(d3array.rollup(rawDataStates, ([d]) => d.cases, d => d.date, d => d.state))
-            .map(([date, data]) => [new Date(date), data])
-            .sort(([a], [b]) => d3.ascending(a, b))
-
-        //console.log(datevalues)
-
-        //rank function
-        const rank = (value) => {
-            const data = Array.from(states, state => ({state, value: value(state)}));
-            data.sort((a, b) => d3.descending(a.value, b.value));
-            for (let i = 0; i < data.length; ++i) data[i].rank = Math.min(top, i);
-            return data;
-        }
-
-
-        //keyframes
-       // Since our rank helper above takes a function,
-        // so we can use it to interpolate values linearly.
-        // If aa is the starting value and bb is the ending value,
-        // then we vary the parameter t \in [0,1]t∈[0,1] to compute the interpolated value a(1 - t) + bta(1−t)+bt.
-        // For any missing data—remember, turnover—we treat the value as zero.
-        const keyframes = [];
-        let ka, a, kb, b;
-        for ([[ka, a], [kb, b]] of d3.pairs(datevalues)) {
-            for (let i = 0; i < k; ++i) {
-                const t = i / k;
-                keyframes.push([
-                    new Date(ka * (1 - t) + kb * t),
-                    rank(name => (a.get(name) || 0) * (1 - t) + (b.get(name) || 0) * t)
-                ]);
-            }
-        }
-        keyframes.push([new Date(kb),
-            rank(name => b.get(name) || 0)]);
-        //console.log(keyframes)
-
-
-        //name frames
-        const nameframes = d3array.groups(keyframes.flatMap(([, data]) => data), d => d.state)
-       // console.log(nameframes)
-
-
-        //prev and next
-        const prev = new Map(nameframes.flatMap(([, data]) => d3.pairs(data, (a, b) => [b, a])))
-        const next = new Map(nameframes.flatMap(([, data]) => d3.pairs(data)))
+    if(prev && prev !== 0){
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // For drawing
@@ -187,7 +125,7 @@ function RacingBar() {
                 colour += ('00' + value.toString(16)).substr(-2);
             }
             return colour;
-    }
+        }
 
 
 
@@ -200,27 +138,27 @@ function RacingBar() {
 
         const createChart = async () =>{
             //d3.select(refDiv.current).remove()
-           // console.log("draw")
+            // console.log("draw")
             const svg = d3
                 .select(refDiv.current)
                 .append("svg")
                 .attr("width", "600")
-                .attr("height", "600")
+                .attr("height", "450")
                 .attr("id", "racingbarchart");
 
             const visG = svg.append("g")
                 .attr("id","mainchart")
-                .attr("transform", "translate(0,100)")
+                .attr("transform", "translate(0,55)")
 
 
             //title
             svg.append("text")
-                .attr("transform", "translate(200,0)")
+                .attr("transform", "translate(100,0)")
                 .attr("x", 50)
                 .attr("y", 50)
                 .attr("font-size", "20px")
                 .attr("class", "title")
-                .text("COVID-19 Racing Bar")
+                .text(title)
 
             const updateBars = bars(visG);
             const updateAxis = axis(visG);
@@ -229,8 +167,8 @@ function RacingBar() {
             await visG.node();
             for (let i = 0;i<keyframes.length-1;i++) {
                 let keyframe = keyframes[i]
-              //  console.log("draw frame")
-               // console.log(keyframe)
+                //  console.log("draw frame")
+                // console.log(keyframe)
                 const transition = visG.transition()
                     .duration(duration)
                     .ease(d3.easeLinear);
