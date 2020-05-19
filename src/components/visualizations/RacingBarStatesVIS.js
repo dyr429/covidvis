@@ -9,8 +9,8 @@ function RacingBarStatesVIS() {
     const top = 10
     const k = 10
     const duration = 50
-    const height = 400
-    const width = 400
+    const height = 430
+    const width = 500
     const barSize = 35
     const margin = ({top: 16, right: 6, bottom: 6, left: 0})
     // const keyframes = [];
@@ -95,6 +95,7 @@ function RacingBarStatesVIS() {
                   margin={margin}
                   duration={duration}
                   title="COVID-19 By State"
+                  fieldName={"state"}
        />
     )
 }

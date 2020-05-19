@@ -9,8 +9,8 @@ function RacingBarCountiesVIS({stateName}) {
     const top = 10
     const k = 10
     const duration = 50
-    const height = 400
-    const width = 400
+    const height = 430
+    const width = 500
     const barSize = 35
     const margin = ({top: 16, right: 6, bottom: 6, left: 0})
     // const keyframes = [];
@@ -25,14 +25,27 @@ function RacingBarCountiesVIS({stateName}) {
 
     if(rawData&&rawData.length>0) {
         //prepare data
+        const MAData = rawData.filter((d)=>{
+            return d.state === 'Massachusetts'
+        })
+        //add missing data
+        let startDate = new Date("01/21/2020")
+        let endDate = new Date ("01/31/2020")
+        for (let day = startDate; day <= endDate; day.setDate(day.getDate() + 1)) {
+            let dateStr = "" + day.getMonth()+1+"/"+day.getDate()+"/"+day.getFullYear()
+            MAData.unshift({date:dateStr, county: "Suffolk", state: "Massachusetts",fips:"25025",cases:"0"})
 
+        }
+
+
+        console.log(MAData)
         //unique states
         //TODO use static array to imporove performance+
-        const states = new Set(rawData.map((d) => d.state))
+        const counties = new Set(MAData.map((d) => d.county))
         //console.log(states)
 
         // group by time
-        const datevalues = Array.from(d3array.rollup(rawData, ([d]) => d.cases, d => d.date, d => d.state))
+        const datevalues = Array.from(d3array.rollup(MAData, ([d]) => d.cases, d => d.date, d => d.county))
             .map(([date, data]) => [new Date(date), data])
             .sort(([a], [b]) => d3.ascending(a, b))
 
@@ -40,7 +53,7 @@ function RacingBarCountiesVIS({stateName}) {
 
         //rank function
         const rank = (value) => {
-            const data = Array.from(states, state => ({state, value: value(state)}));
+            const data = Array.from(counties, county => ({county, value: value(county)}));
             data.sort((a, b) => d3.descending(a.value, b.value));
             for (let i = 0; i < data.length; ++i) data[i].rank = Math.min(top, i);
             return data;
@@ -69,7 +82,7 @@ function RacingBarCountiesVIS({stateName}) {
         //console.log(keyframes)
         setKeyframes(keyframes)
         //name frames
-        const nameframes = d3array.groups(keyframes.flatMap(([, data]) => data), d => d.state)
+        const nameframes = d3array.groups(keyframes.flatMap(([, data]) => data), d => d.county)
         // console.log(nameframes)
 
 
@@ -91,7 +104,8 @@ function RacingBarCountiesVIS({stateName}) {
                   barSize={barSize}
                   margin={margin}
                   duration={duration}
-                  title={"COVID-19 By County"}
+                  title={"COVID-19 By County in MA"}
+                  fieldName={"county"}
        />
     )
 }

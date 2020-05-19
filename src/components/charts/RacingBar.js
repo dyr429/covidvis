@@ -3,7 +3,7 @@ import {useSelector} from "react-redux";
 import * as d3 from "d3";
 import * as d3array from "d3-array"
 
-function RacingBar({prev,next,keyframes,margin,barSize,width,height,duration,top,title}) {
+function RacingBar({prev,next,keyframes,margin,barSize,width,height,duration,top,title,fieldName}) {
   //  const rawData = useSelector(state => state.rawDataStates)
     const refDiv = useRef(null);
     if(prev && prev !== 0){
@@ -32,7 +32,8 @@ function RacingBar({prev,next,keyframes,margin,barSize,width,height,duration,top
                 )
                 .call(bar => bar.transition(transition)
                     .attr("y", d => y(d.rank))
-                    .attr("width", d => x(d.value) - x(0)));
+                    .attr("width", d => x(d.value) - x(0)))
+                    .attr("x",0)
         }
 
 
@@ -45,14 +46,14 @@ function RacingBar({prev,next,keyframes,margin,barSize,width,height,duration,top
                 .selectAll("text");
 
             return ([date, data], transition) => label = label
-                .data(data.slice(0, top), d => d.state)
+                .data(data.slice(0, top), d => d[fieldName])
                 .join(
                     enter => enter.append("text")
                         .attr("transform", d => `translate(${x((prev.get(d) || d).value)},${y((prev.get(d) || d).rank)})`)
                         .attr("y", y.bandwidth() / 2)
                         .attr("x", 6)
                         .attr("dy", "-0.25em")
-                        .text(d => d.state)
+                        .text(d => d[fieldName])
                         .call(text => text.append("tspan")
                             .attr("fill-opacity", 0.7)
                             .attr("font-weight", "normal")
@@ -114,7 +115,8 @@ function RacingBar({prev,next,keyframes,margin,barSize,width,height,duration,top
         const formatDate = d3.utcFormat("%B %d, %Y")
 
         const color = (d) => {
-            let str = d.state
+            console.log(d.rank)
+            let str = d[fieldName]
             let hash = 0;
             for (var i = 0; i < str.length; i++) {
                 hash = str.charCodeAt(i) + ((hash << 5) - hash);
@@ -143,7 +145,7 @@ function RacingBar({prev,next,keyframes,margin,barSize,width,height,duration,top
                 .select(refDiv.current)
                 .append("svg")
                 .attr("width", "600")
-                .attr("height", "450")
+                .attr("height", "440")
                 .attr("id", "racingbarchart");
 
             const visG = svg.append("g")
@@ -153,7 +155,7 @@ function RacingBar({prev,next,keyframes,margin,barSize,width,height,duration,top
 
             //title
             svg.append("text")
-                .attr("transform", "translate(100,0)")
+                .attr("transform", "translate(150,-25)")
                 .attr("x", 50)
                 .attr("y", 50)
                 .attr("font-size", "20px")

@@ -60,12 +60,6 @@ function RacingLine() {
         svg.append("g")
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x))
-            .selectAll("text")
-            .attr("y", 0)
-            .attr("x", 9)
-            .attr("dy", ".35em")
-            .attr("transform", "rotate(90)")
-            .style("text-anchor", "start");
 
         // Add  lines
         const pathCase = svg.append("path")
@@ -83,7 +77,7 @@ function RacingLine() {
             .attr("stroke-dasharray", totalLength + " " + totalLength)
             .attr("stroke-dashoffset", totalLength)
             .transition()
-            .duration(80000)
+            .duration(65000)
             .ease(d3.easeLinear)
             .attr("stroke-dashoffset", 0)
 
